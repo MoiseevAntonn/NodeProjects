@@ -1,14 +1,15 @@
-module.exports = function(res,db,data){
-	"use strict";
-	var now = new Date();
-	var count = 0;
-	data=data.replace(/#time#/i,()=>now.toTimeString());
-	data=data.replace(/#count#/i,()=>String(count));
-	var links = db.phones.map((phone,index)=>'<a href=\'/details?id='+phone.id+'\'>'+phone.name+'</a>\n')
-	data=data.replace(/#links#/i,links);
-	res.statusCode = 200;
-	res.setHeader('Content-type','text/html');
-	res.write(data);
-	count++;
-	res.end();
+const db = require('../db');
+const fs = require('fs');
+
+module.exports = function (req, res) {
+	fs.readFile('index.template.html', 'utf8', (err, template) =>  {
+		db.getAllPhones((err, phones) => {
+			const links = phones.map(phone => `<a href='/details?id=${phone.id}'>${phone.name}</a>`);
+			const responseText = template.replace('#links#', links.join(''));
+			res.statusCode = 200;
+			res.setHeader('Content-type', 'text/html');
+			res.write(responseText);	
+			res.end();
+		});		
+	});	
 };

@@ -1,43 +1,19 @@
-var http = require('http');
-var fs = require('fs');
-var db = require('./db')
-var url = require('url');
+const http = require('http');
+const fs = require('fs');
+const url = require('url');
 
+const indexHandler = require('./handlers/index.js');
+const detailHandler = require('./handlers/detail.js');
 
-/*var pg = require('pg');
-var client = new pg.Client({
-	database: 'phonestore',
-	user: 'dbuser',
-	password: 'dbuser'
-});
-
-
-client.connect();
-
-client.query('SELECT * FROM Phone', (err, res) => {
-  console.log(err);
-  console.log(res.rows); // Hello World!
-  client.end()
-})*/
-
-var indexHandler = require('./handlers/index.js');
-var detailHandler = require('./handlers/detail.js');
-
-
-http.createServer(function(req,res){
-	fs.writeFileSync('data.html','ale blya','utf8');
-	fs.readFile('first_project.html','utf8',function(err,data){
-		"use strict";
-		let u = url.parse(req.url,true);
-		let path = u.pathname;
-		if (path === '/'){
-			indexHandler(res,db,data);
-		}else if (path === '/details'){
-			detailHandler(res,db,u.query.id);
-		}else {
-			res.statusCode = 404;
-			res.end()
-		}
-	});
-	
+http.createServer(function (req, res) {
+	const parsedUrl = url.parse(req.url);
+	const path = parsedUrl.pathname;
+	if (path === '/') {
+		indexHandler(req, res);
+	} else if (path === '/details') {
+		detailHandler(req, res);
+	} else {
+		res.statusCode = 404;
+		res.end()
+	}
 }).listen(3000);
